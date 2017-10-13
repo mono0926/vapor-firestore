@@ -22,7 +22,8 @@ public struct FireStoreVaporClient: FirestoreClient {
         self.logger = logger
     }
 
-    public func get<T: Codable>(authToken: String, path: String) throws -> T {
+    public func get<T: Codable>(authToken: String,
+                                path: String) throws -> T {
         let response = try client.get(
             baseUrl.appendingPathComponent(path).absoluteString,
             createHeaders(authToken: authToken))
@@ -31,7 +32,9 @@ public struct FireStoreVaporClient: FirestoreClient {
         return try! JSONDecoder.firestore.decode(T.self, from: Data(bytes: bytes))
     }
 
-    public func post<T: Codable>(authToken: String, path: String, body: T) throws -> Document<T> {
+    public func post<T: Codable>(authToken: String,
+                                 path: String,
+                                 body: T) throws -> Document<T> {
         let data = try JSONEncoder.firestore.encode(["fields": body])
         let response = try client.post(
             baseUrl.appendingPathComponent(path).absoluteString,
@@ -40,6 +43,28 @@ public struct FireStoreVaporClient: FirestoreClient {
         let bytes = response.body.bytes ?? []
         logger.debug(bytes.makeString())
         return try JSONDecoder.firestore.decode(Document<T>.self, from: Data(bytes: bytes))
+    }
+
+    public func patch<T: Codable>(authToken: String,
+                                  path: String,
+                                  body: T) throws -> Document<T> {
+        let data = try JSONEncoder.firestore.encode(["fields": body])
+        let response = try client.patch(
+            baseUrl.appendingPathComponent(path).absoluteString,
+            createHeaders(authToken: authToken),
+            Body.data(data.makeBytes()))
+        let bytes = response.body.bytes ?? []
+        logger.debug(bytes.makeString())
+        return try JSONDecoder.firestore.decode(Document<T>.self, from: Data(bytes: bytes))
+    }
+
+    public func delete(authToken: String,
+                       path: String) throws {
+        let response = try client.delete(
+            baseUrl.appendingPathComponent(path).absoluteString,
+            createHeaders(authToken: authToken))
+        let bytes = response.body.bytes ?? []
+        logger.debug(bytes.makeString())
     }
 
     private func createHeaders(authToken: String) -> [HeaderKey: String] {
