@@ -12,7 +12,7 @@ extension JSONDecoder {
             if let date = DateFormatter.iso8601WithoutMilliseconds.date(from: str) {
                 return date
             }
-            throw NSError()
+            throw FirestoreError.parseFailed(data: str)
         }
         return decoder
     }()
