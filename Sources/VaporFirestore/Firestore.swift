@@ -85,7 +85,8 @@ public struct FireStoreVaporClient: FirestoreClient {
         if case 200..<300 = response.status.statusCode {
             return try JSONDecoder.firestore.decode(T.self, from: Data(bytes: bytes))
         }
-        let errorBody = try JSONDecoder.firestore.decode([String: FirestoreErrorResponseBody].self, from: Data(bytes: bytes))
+        let errorBody = try JSONDecoder.firestore.decode([String: FirestoreErrorResponseBody].self,
+                                                         from: Data(bytes: bytes))
         throw FirestoreError.response(error: errorBody["error"]!)
     }
 }
