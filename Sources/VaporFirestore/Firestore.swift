@@ -4,7 +4,17 @@ import Foundation
 import HTTP
 
 public protocol FirestoreClient {
-    // TODO: あとで
+    func get<T: Codable>(authToken: String,
+                         path: String) throws -> T
+    func post<T: Codable>(authToken: String,
+                          path: String,
+                          body: T) throws -> Document<T>
+
+    func patch<T: Codable>(authToken: String,
+                           path: String,
+                           body: T) throws -> Document<T>
+    func delete(authToken: String,
+                path: String) throws
 }
 
 public struct FireStoreVaporClient: FirestoreClient {
@@ -196,3 +206,4 @@ extension DateFormatter {
         return formatter
     }()
 }
+

@@ -19,7 +19,7 @@ struct Info: Codable {
 
 // TODO: senario test
 class VaporFirestoreTests: XCTestCase {
-    private let target = FireStoreVaporClient(projectId: "ighost-dev")
+    private let target: FirestoreClient = FireStoreVaporClient(projectId: "ighost-dev")
     private let authToken = "YOUR_AUTH_TOKEN"
     func testGetCollection() throws {
         let result: VaporFirestore.Collection<Fields> = try target.get(authToken: authToken,
