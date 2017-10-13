@@ -9,6 +9,7 @@ public struct Document<T: Codable>: Codable {
     public let createTime: Date
     public let updateTime: Date
     public let fields: T?
+    public var id: String { return String(name.split(separator: "/").last ?? "") }
 }
 
 public struct MapValue<T: Codable>: Codable {
