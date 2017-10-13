@@ -16,7 +16,7 @@ let package = Package(
     targets: [
         .target(
             name: "VaporFirestore",
-            dependencies: []),
+            dependencies: ["Vapor"]),
         .testTarget(
             name: "VaporFirestoreTests",
             dependencies: ["VaporFirestore"]),
