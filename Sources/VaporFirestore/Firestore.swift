@@ -37,9 +37,8 @@ public struct FireStoreVaporClient: FirestoreClient {
         let response = try client.get(
             baseUrl.appendingPathComponent(path).absoluteString,
             createHeaders(authToken: authToken))
-        let bytes = response.body.bytes ?? []
-        logger.debug(bytes.makeString())
-        return try! JSONDecoder.firestore.decode(T.self, from: Data(bytes: bytes))
+        return try makeResult(response: response)
+
     }
 
     public func post<T: Codable>(authToken: String,
@@ -52,7 +51,7 @@ public struct FireStoreVaporClient: FirestoreClient {
             Body.data(data.makeBytes()))
         let bytes = response.body.bytes ?? []
         logger.debug(bytes.makeString())
-        return try JSONDecoder.firestore.decode(Document<T>.self, from: Data(bytes: bytes))
+        return try makeResult(response: response)
     }
 
     public func patch<T: Codable>(authToken: String,
@@ -63,9 +62,8 @@ public struct FireStoreVaporClient: FirestoreClient {
             baseUrl.appendingPathComponent(path).absoluteString,
             createHeaders(authToken: authToken),
             Body.data(data.makeBytes()))
-        let bytes = response.body.bytes ?? []
-        logger.debug(bytes.makeString())
-        return try JSONDecoder.firestore.decode(Document<T>.self, from: Data(bytes: bytes))
+        return try makeResult(response: response)
+
     }
 
     public func delete(authToken: String,
@@ -80,9 +78,14 @@ public struct FireStoreVaporClient: FirestoreClient {
     private func createHeaders(authToken: String) -> [HeaderKey: String] {
         return ["Authorization": "Bearer \(authToken)"]
     }
+
+    private func makeResult<T: Codable>(response: Response) throws -> T {
+        let bytes = response.body.bytes ?? []
+        logger.debug(bytes.makeString())
+        if case 200..<300 = response.status.statusCode {
+            return try JSONDecoder.firestore.decode(T.self, from: Data(bytes: bytes))
+        }
+        let errorBody = try JSONDecoder.firestore.decode([String: FirestoreErrorResponseBody].self, from: Data(bytes: bytes))
+        throw FirestoreError.response(error: errorBody["error"]!)
+    }
 }
-
-
-
-
-

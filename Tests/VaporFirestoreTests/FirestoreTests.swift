@@ -64,6 +64,16 @@ class VaporFirestoreTests: XCTestCase {
         try target.delete(authToken: authToken,
                           path: "\(collection)/\(postResponse.id)")
 
+        // GET Document
+        XCTAssertThrowsError(try target.get(authToken: authToken, path: "\(collection)/\(postResponse.id)") as Document<Fields>) { error in
+            if case FirestoreError.response(let error) = error {
+                XCTAssertEqual(error.code, 404)
+                XCTAssertEqual(error.message, "Document \"projects/ighost-dev/databases/(default)/documents/test-collections/\(postResponse.id)\" not found.")
+                XCTAssertEqual(error.status, "NOT_FOUND")
+            } else {
+                XCTFail()
+            }
+        }
     }
 
     static var allTests = [
