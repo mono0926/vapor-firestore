@@ -17,9 +17,11 @@ struct Info: Codable {
     let foo: StringValue
 }
 
+private let projectId = "YOUR_PROJECT_ID"
 private let authToken = "YOUR_AUTH_TOKEN"
+
 class VaporFirestoreTests: XCTestCase {
-    private let target: FirestoreClient = FireStoreVaporClient(projectId: "ighost-dev", authToken: authToken)
+    private let target: FirestoreClient = FireStoreVaporClient(projectId: projectId, authToken: authToken)
     private let collection = "test-collections"
     func test() throws {
         var fields = Fields(name: StringValue("dog"),
@@ -30,7 +32,7 @@ class VaporFirestoreTests: XCTestCase {
                             lists: ArrayValue([IntegerValue(1), IntegerValue(2)]),
                             empty: NullValue(),
                             now: TimestampValue(Date()),
-                            ref: ReferenceValue("projects/ighost-dev/databases/(default)/documents/test-collections/4IzJ67nUvIZ12VxVwCB0")
+                            ref: ReferenceValue("projects/\(projectId)/databases/(default)/documents/test-collections/4IzJ67nUvIZ12VxVwCB0")
         )
 
         // POST
@@ -56,19 +58,22 @@ class VaporFirestoreTests: XCTestCase {
         let fieldsRespons4 = getResponse2.documents.filter { $0.id == postResponse.id }.first!.fields!
         XCTAssertEqual(fieldsRespons4.name.stringValue, "dog2")
 
-        // DELETE
+        // DELETE Document
         try target.delete(path: "\(collection)/\(postResponse.id)")
 
         // GET Document
         XCTAssertThrowsError(try target.get(path: "\(collection)/\(postResponse.id)") as Document<Fields>) { error in
             if case FirestoreError.response(let error) = error {
                 XCTAssertEqual(error.code, 404)
-                XCTAssertEqual(error.message, "Document \"projects/ighost-dev/databases/(default)/documents/test-collections/\(postResponse.id)\" not found.")
+                XCTAssertEqual(error.message, "Document \"projects/\(projectId)/databases/(default)/documents/test-collections/\(postResponse.id)\" not found.")
                 XCTAssertEqual(error.status, "NOT_FOUND")
             } else {
                 XCTFail()
             }
         }
+
+        // DELETE Collection
+        try target.delete(path: collection)
     }
 
     static var allTests = [
