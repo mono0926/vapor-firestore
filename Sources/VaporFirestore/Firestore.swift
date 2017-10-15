@@ -4,36 +4,34 @@ import Foundation
 import HTTP
 
 public protocol FirestoreClient {
-    func get<T: Codable>(authToken: String,
-                         path: String) throws -> T
-    func post<T: Codable>(authToken: String,
-                          path: String,
+    func get<T: Codable>(path: String) throws -> T
+    func post<T: Codable>(path: String,
                           body: T) throws -> Document<T>
 
-    func patch<T: Codable>(authToken: String,
-                           path: String,
+    func patch<T: Codable>(path: String,
                            body: T) throws -> Document<T>
-    func delete(authToken: String,
-                path: String) throws
+    func delete(path: String) throws
 }
 
 public struct FireStoreVaporClient: FirestoreClient {
     private let projectId: String
+    private let authToken: String
     private let baseUrl: URL
     private let client: ClientFactoryProtocol
     private let logger: LogProtocol
 
     public init(projectId: String,
+                authToken: String,
                 client: ClientFactoryProtocol = EngineClientFactory(),
                 logger: LogProtocol = ConsoleLogger(Terminal(arguments: []))) {
         self.projectId = projectId
+        self.authToken = authToken
         self.baseUrl = URL(string: "https://firestore.googleapis.com/v1beta1/projects/\(projectId)/databases/(default)/documents/")!
         self.client = client
         self.logger = logger
     }
 
-    public func get<T: Codable>(authToken: String,
-                                path: String) throws -> T {
+    public func get<T: Codable>(path: String) throws -> T {
         let response = try client.get(
             baseUrl.appendingPathComponent(path).absoluteString,
             createHeaders(authToken: authToken))
@@ -41,8 +39,7 @@ public struct FireStoreVaporClient: FirestoreClient {
 
     }
 
-    public func post<T: Codable>(authToken: String,
-                                 path: String,
+    public func post<T: Codable>(path: String,
                                  body: T) throws -> Document<T> {
         let data = try JSONEncoder.firestore.encode(["fields": body])
         let response = try client.post(
@@ -54,8 +51,7 @@ public struct FireStoreVaporClient: FirestoreClient {
         return try makeResult(response: response)
     }
 
-    public func patch<T: Codable>(authToken: String,
-                                  path: String,
+    public func patch<T: Codable>(path: String,
                                   body: T) throws -> Document<T> {
         let data = try JSONEncoder.firestore.encode(["fields": body])
         let response = try client.patch(
@@ -66,8 +62,7 @@ public struct FireStoreVaporClient: FirestoreClient {
 
     }
 
-    public func delete(authToken: String,
-                       path: String) throws {
+    public func delete(path: String) throws {
         let response = try client.delete(
             baseUrl.appendingPathComponent(path).absoluteString,
             createHeaders(authToken: authToken))

@@ -9,7 +9,11 @@ extension FireStoreVaporClient: ConfigInitializable {
         guard let projectId = firebase["projectId"]?.string else {
             throw ConfigError.missing(key: ["projectId"], file: "firebase", desiredType: String.self)
         }
+        guard let authToken = firebase["firestoreToken"]?.string else {
+            throw ConfigError.missing(key: ["firestoreToken"], file: "firebase", desiredType: String.self)
+        }
         self = FireStoreVaporClient(projectId: projectId,
+                                    authToken: authToken,
                                     client: try config.resolveClient(),
                                     logger: try config.resolveLog())
     }

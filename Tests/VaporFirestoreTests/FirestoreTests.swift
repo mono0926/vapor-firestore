@@ -17,9 +17,9 @@ struct Info: Codable {
     let foo: StringValue
 }
 
+private let authToken = "YOUR_AUTH_TOKEN"
 class VaporFirestoreTests: XCTestCase {
-    private let target: FirestoreClient = FireStoreVaporClient(projectId: "ighost-dev")
-    private let authToken = "YOUR_AUTH_TOKEN"
+    private let target: FirestoreClient = FireStoreVaporClient(projectId: "ighost-dev", authToken: authToken)
     private let collection = "test-collections"
     func test() throws {
         var fields = Fields(name: StringValue("dog"),
@@ -34,38 +34,33 @@ class VaporFirestoreTests: XCTestCase {
         )
 
         // POST
-        let postResponse = try target.post(authToken: authToken,
-                                     path: collection,
+        let postResponse = try target.post(path: collection,
                                      body: fields)
         let fieldsResponse1 = postResponse.fields!
         XCTAssertEqual(fieldsResponse1.name.stringValue, "dog")
 
         // PATCH
         fields.name = StringValue("dog2")
-        let patchResponse = try target.patch(authToken: authToken,
-                                      path: "\(collection)/\(postResponse.id)",
+        let patchResponse = try target.patch(path: "\(collection)/\(postResponse.id)",
                                       body: fields)
         let fieldsResponse2 = patchResponse.fields!
         XCTAssertEqual(fieldsResponse2.name.stringValue, "dog2")
 
         // GET Document
-        let getResponse1: Document<Fields> = try target.get(authToken: authToken,
-                                                      path: "\(collection)/\(postResponse.id)")
+        let getResponse1: Document<Fields> = try target.get(path: "\(collection)/\(postResponse.id)")
         let fieldsRespons3 = getResponse1.fields!
         XCTAssertEqual(fieldsRespons3.name.stringValue, "dog2")
 
         // GET Collection
-        let getResponse2: VaporFirestore.Collection<Fields> = try target.get(authToken: authToken,
-                                                                             path: collection)
+        let getResponse2: VaporFirestore.Collection<Fields> = try target.get(path: collection)
         let fieldsRespons4 = getResponse2.documents.filter { $0.id == postResponse.id }.first!.fields!
         XCTAssertEqual(fieldsRespons4.name.stringValue, "dog2")
 
         // DELETE
-        try target.delete(authToken: authToken,
-                          path: "\(collection)/\(postResponse.id)")
+        try target.delete(path: "\(collection)/\(postResponse.id)")
 
         // GET Document
-        XCTAssertThrowsError(try target.get(authToken: authToken, path: "\(collection)/\(postResponse.id)") as Document<Fields>) { error in
+        XCTAssertThrowsError(try target.get(path: "\(collection)/\(postResponse.id)") as Document<Fields>) { error in
             if case FirestoreError.response(let error) = error {
                 XCTAssertEqual(error.code, 404)
                 XCTAssertEqual(error.message, "Document \"projects/ighost-dev/databases/(default)/documents/test-collections/\(postResponse.id)\" not found.")
