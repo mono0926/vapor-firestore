@@ -1,7 +1,7 @@
 import Foundation
 import Vapor
 
-extension FireStoreVaporClient: ConfigInitializable {
+extension FirestoreVaporClient: ConfigInitializable {
     public init(config: Config) throws {
         guard let firebase = config["firebase"] else {
             throw ConfigError.missingFile("firebase")
@@ -9,7 +9,7 @@ extension FireStoreVaporClient: ConfigInitializable {
         guard let projectId = firebase["projectId"]?.string else {
             throw ConfigError.missing(key: ["projectId"], file: "firebase", desiredType: String.self)
         }
-        self = FireStoreVaporClient(projectId: projectId,
+        self = FirestoreVaporClient(projectId: projectId,
                                     client: try config.resolveClient(),
                                     logger: try config.resolveLog())
     }
@@ -27,7 +27,7 @@ extension Config {
             file: "firebase",
             keyPath: ["firestore"],
             as: FirestoreClient.self,
-            default: FireStoreVaporClient.init
+            default: FirestoreVaporClient.init
         )
     }
 }

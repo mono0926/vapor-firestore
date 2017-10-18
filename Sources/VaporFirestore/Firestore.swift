@@ -17,7 +17,7 @@ public protocol FirestoreClient {
                 path: String) throws
 }
 
-public struct FireStoreVaporClient: FirestoreClient {
+public struct FirestoreVaporClient: FirestoreClient {
     private let projectId: String
     private let baseUrl: URL
     private let client: ClientFactoryProtocol

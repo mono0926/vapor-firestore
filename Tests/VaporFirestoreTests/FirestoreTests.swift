@@ -21,7 +21,7 @@ private let projectId = "YOUR_PROJECT_ID"
 private let authToken = "YOUR_AUTH_TOKEN"
 
 class VaporFirestoreTests: XCTestCase {
-    private let target: FirestoreClient = FireStoreVaporClient(projectId: projectId)
+    private let target: FirestoreClient = FirestoreVaporClient(projectId: projectId)
     private let collection = "test-collections"
     func test() throws {
         var fields = Fields(name: StringValue("dog"),
