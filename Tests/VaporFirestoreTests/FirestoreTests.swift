@@ -32,7 +32,7 @@ class VaporFirestoreTests: XCTestCase {
                             lists: ArrayValue([IntegerValue(1), IntegerValue(2)]),
                             empty: NullValue(),
                             now: TimestampValue(Date()),
-                            ref: ReferenceValue("projects/\(projectId)/databases/(default)/documents/test-collections/4IzJ67nUvIZ12VxVwCB0")
+                            ref: target.createRef("test-collections/4IzJ67nUvIZ12VxVwCB0")
         )
 
         // POST

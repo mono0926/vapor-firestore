@@ -85,7 +85,7 @@ public struct TimestampValue: Codable {
 
 public struct ReferenceValue: Codable {
     public let referenceValue: String
-    public init(_ value: String) {
+    init(_ value: String) {
         referenceValue = value
     }
 }

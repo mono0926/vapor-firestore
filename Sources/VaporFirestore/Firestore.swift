@@ -15,6 +15,7 @@ public protocol FirestoreClient {
                            body: T) throws -> Document<T>
     func delete(authToken: String,
                 path: String) throws
+    func createRef(_ value: String) -> ReferenceValue
 }
 
 public struct FirestoreVaporClient: FirestoreClient {
@@ -73,6 +74,10 @@ public struct FirestoreVaporClient: FirestoreClient {
             createHeaders(authToken: authToken))
         let bytes = response.body.bytes ?? []
         logger.debug(bytes.makeString())
+    }
+
+    public func createRef(_ value: String) -> ReferenceValue {
+        return ReferenceValue("projects/\(projectId)/databases/(default)/documents/\(value)")
     }
 
     private func createHeaders(authToken: String) -> [HeaderKey: String] {
