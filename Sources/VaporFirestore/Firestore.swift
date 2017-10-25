@@ -74,6 +74,12 @@ public struct FirestoreVaporClient: FirestoreClient {
             createHeaders(authToken: authToken))
         let bytes = response.body.bytes ?? []
         logger.debug(bytes.makeString())
+        if case 200..<300 = response.status.statusCode {
+            return
+        }
+        let errorBody = try JSONDecoder.firestore.decode([String: FirestoreErrorResponseBody].self,
+                                                         from: Data(bytes: bytes))
+        throw FirestoreError.response(error: errorBody["error"]!)
     }
 
     public func createRef(_ value: String) -> ReferenceValue {
